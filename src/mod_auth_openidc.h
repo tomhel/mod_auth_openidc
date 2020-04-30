@@ -152,6 +152,8 @@ APLOG_USE_MODULE(auth_openidc);
 #define OIDC_OAUTH_ACCEPT_TOKEN_IN_COOKIE  8
 /* accept bearer token as basic auth password (non-oauth clients) */
 #define OIDC_OAUTH_ACCEPT_TOKEN_IN_BASIC   16
+/* accept bearer token as uri parameter */
+#define OIDC_OAUTH_ACCEPT_TOKEN_IN_URI     32
 
 /* the hash key of the cookie name value in the list of options */
 #define OIDC_OAUTH_ACCEPT_TOKEN_IN_OPTION_COOKIE_NAME "cookie-name"
@@ -781,6 +783,7 @@ char *oidc_util_http_query_encoded_url(request_rec *r, const char *url, const ap
 char *oidc_util_get_full_path(apr_pool_t *pool, const char *abs_or_rel_filename);
 apr_byte_t oidc_enabled(request_rec *r);
 char *oidc_util_http_form_encoded_data(request_rec *r, const apr_table_t *params);
+char *oidc_util_get_current_uri(request_rec *r);
 
 /* HTTP header constants */
 #define OIDC_HTTP_HDR_COOKIE							"Cookie"

@@ -290,6 +290,19 @@ apr_byte_t oidc_oauth_get_bearer_token(request_rec *r,
 		}
 	}
 
+	if ((*access_token == NULL)
+			&& (accept_token_in & OIDC_OAUTH_ACCEPT_TOKEN_IN_URI)) {
+		const char *auth_line = oidc_util_get_current_uri(r);
+		const char *token_keyword = OIDC_STR_FORWARD_SLASH OIDC_PROTO_ACCESS_TOKEN OIDC_STR_FORWARD_SLASH;
+		char *token_pos;
+		if ((token_pos = strstr(auth_line, token_keyword)) != NULL) {
+			token_pos += strlen(token_keyword);
+			if (strlen(token_pos) > 0) {
+				*access_token = apr_pstrndup(r->pool, token_pos, strcspn(token_pos, OIDC_STR_FORWARD_SLASH));
+			}
+		}
+	}
+
 	if (*access_token == NULL) {
 		oidc_debug(r, "no bearer token found in the allowed methods: %s",
 				oidc_accept_oauth_token_in2str(r->pool, accept_token_in));

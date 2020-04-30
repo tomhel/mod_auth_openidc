@@ -521,6 +521,31 @@ char *oidc_get_current_url(request_rec *r) {
 }
 
 /*
+ * get the URI that is currently being accessed
+ */
+char *oidc_util_get_current_uri(request_rec *r) {
+	char *path = NULL;
+	apr_uri_t uri;
+
+	path = r->uri;
+
+	/* check if we're dealing with a forward proxying secenario i.e. a non-relative URL */
+	if ((path) && (path[0] != '/')) {
+		memset(&uri, 0, sizeof(apr_uri_t));
+		if (apr_uri_parse(r->pool, r->uri, &uri) == APR_SUCCESS)
+			path = uri.path;
+		else
+			oidc_warn(r, "apr_uri_parse failed on non-relative URL: %s",
+					r->uri);
+	} else if (path == NULL || path == '\0') {
+		path = apr_pstrdup(r->pool, OIDC_STR_FORWARD_SLASH);
+	}
+	oidc_debug(r, "current URI '%s'", path);
+
+	return path;
+}
+
+/*
  * determine absolute redirect uri
  */
 const char *oidc_get_redirect_uri(request_rec *r, oidc_cfg *cfg) {
